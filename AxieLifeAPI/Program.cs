@@ -14,6 +14,8 @@ namespace AxieLifeAPI
     {
         public static void Main(string[] args)
         {
+            Console.WriteLine(Environment.CurrentDirectory);
+            Console.WriteLine("");
             CreateWebHostBuilder(args).Build().Run();
         }
 
