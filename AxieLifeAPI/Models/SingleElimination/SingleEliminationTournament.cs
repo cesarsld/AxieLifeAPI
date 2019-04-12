@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using AxieLifeAPI.Models.Notification;
+using AxieLifeAPI.Models.User;
 
 namespace AxieLifeAPI.Models.SingleElimination
 {
@@ -13,19 +15,22 @@ namespace AxieLifeAPI.Models.SingleElimination
 
         public string id;
         public string creatorAddress;
-        public bool canJoin;
-        public List<ParticipantData> participantList;
+
+        public TournamentStates tourneyState;
+
         public int maxPlayers;
         public int secondsBetweenRounds;
         public int totalRoundNumber;
         public int boFormat;
         public int currentRoundTime;
-        public List<MatchUp> matchUpList;
 
-        public SingleEliminationTournament()
-        {
-        }
-        public SingleEliminationTournament(int seconds, string creator, int bo, int max)
+        public List<ParticipantData> participantList;
+        public List<MatchUp> matchUpList;
+        public string winner;
+
+        public List<List<MatchUp>> matchUpHistoryList;
+
+        public SingleEliminationTournament(int seconds, string creator, int bo = 3, int max  = -1)
         {
             id = "";
             for (int i = 0; i < 40; i++)
@@ -33,51 +38,32 @@ namespace AxieLifeAPI.Models.SingleElimination
 
             creatorAddress = creator;
             participantList = new List<ParticipantData>();
-            canJoin = true;
+            tourneyState = TournamentStates.Accepting_Players;
+
             secondsBetweenRounds = seconds;
             boFormat = bo;
             maxPlayers = max;
             totalRoundNumber = 0;
             currentRoundTime = 0;
             matchUpList = new List<MatchUp>();
-
+            matchUpHistoryList = new List<List<MatchUp>>();
+            winner = "";
         }
-        public async Task SetupInitialSeeding()
+
+        public async Task<bool> AddPlayer(UserData user)
         {
-            matchUpList = new List<MatchUp>();
-            var tempList = new List<string>();
-            foreach (var participant in participantList)
-                tempList.Add(participant.ethAddress);
-            var totalParticipants = participantList.Count;
-            int playerCapacity = 1;
-            int rounds = 0;
-            //loop to find how many participants and rounds needed
-            while (totalParticipants > playerCapacity)
+            if (participantList.Exists(u => u.ethAddress == user.id))
+                return false;
+            if (maxPlayers == -1 || participantList.Count < maxPlayers)
             {
-                playerCapacity *= 2;
-                rounds++;
+                participantList.Add(new ParticipantData(user));
+                if (participantList.Count == maxPlayers)
+                    tourneyState = TournamentStates.Ready_For_Seeding;
+                await SaveDataToDb();
+                return true;
+
             }
-            totalRoundNumber = rounds;
-            int virtualPlayersNeeded = playerCapacity - totalParticipants;
-            for (int i = 0; i < virtualPlayersNeeded; i++)
-            {
-                var index = _rand.Next(totalParticipants);
-                matchUpList.Add(new MatchUp(tempList[index], VIRTUAL_PLAYER));
-                totalParticipants--;
-                tempList.RemoveAt(index);
-            }
-            //fill bracket with remaining bracket
-            while (totalParticipants != 0)
-            {
-                var index = _rand.Next(tempList.Count);
-                var player = tempList[index];
-                tempList.RemoveAt(index);
-                var index2 = _rand.Next(tempList.Count);
-                var player2 = tempList[index2];
-                tempList.RemoveAt(index2);
-                matchUpList.Add(new MatchUp(player, player2));
-            }
-            await SaveDataToDb();
+            else return false;
         }
 
         public async Task SaveDataToDb()
@@ -90,72 +76,6 @@ namespace AxieLifeAPI.Models.SingleElimination
             }
             else
                 await collec.InsertOneAsync(this);
-        }
-
-        public async Task UpdateCompetition()
-        {
-            await Utils.UpdateChallengesDB();
-            var newList = new List<MatchUp>();
-            bool newPair = true;
-            foreach (var matchup in matchUpList)
-            {
-                //creates new matchup every 2 matches read
-                if (newPair)
-                    newList.Add(new MatchUp());
-                if (matchup.player2 != VIRTUAL_PLAYER)
-                {
-                    List<ChallengeData> bestOfMatches = await GetMatchesFromRange(matchup.player1, matchup.player2, currentRoundTime, currentRoundTime + secondsBetweenRounds);
-                    if (bestOfMatches.Count >= boFormat)
-                    {
-                        int player1Wins = 0;
-                        int player2Wins = 0;
-                        for (int i = 0; i < boFormat; i++)
-                        {
-                            if (matchup.player1.ToLower() == bestOfMatches[i].winner.ToLower())
-                                player1Wins++;
-                            else
-                                player2Wins++;
-                        }
-                        if (player1Wins > player2Wins)
-                        {
-                            participantList.Find(x => x.ethAddress.ToLower() == matchup.player2.ToLower()).stillCompeting = false;
-                            matchup.winner = matchup.player1;
-                        }
-                        else
-                        {
-                            participantList.Find(x => x.ethAddress.ToLower() == matchup.player1.ToLower()).stillCompeting = false;
-                            matchup.winner = matchup.player2;
-                        }
-                    }
-                    if (newPair)
-                        newList.Last().player1 = matchup.winner;
-                    else
-                        newList.Last().player2 = matchup.winner;
-                }
-                //make player with bye move to next round
-                else
-                {
-                    if (newPair)
-                        newList.Last().player1 = matchup.player1;
-                    else
-                        newList.Last().player2 = matchup.player1;
-                }
-                newPair = !newPair;
-            }
-            matchUpList = newList;
-            await SaveDataToDb();
-
-        }
-
-        public async Task<List<ChallengeData>> GetMatchesFromRange(string address, string address2, int a = 0, int b = 2147483647)
-        {
-            var collec = DatabaseConnection.GetDb().GetCollection<ChallengeData>("ChallengeCollec");
-
-            var list = (await collec.FindAsync(data => (data.winner.ToLower() == address.ToLower() && data.loser.ToLower() == address2.ToLower())
-                                                    || (data.winner.ToLower() == address2.ToLower() && data.loser.ToLower() == address.ToLower()))).ToList();
-            list = list.Where(w => w.unixTime > a && w.unixTime < b).ToList();
-            return list;
-
         }
     }
 }
