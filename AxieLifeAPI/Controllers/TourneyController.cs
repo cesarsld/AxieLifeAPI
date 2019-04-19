@@ -35,8 +35,8 @@ namespace AxieLifeAPI.Controllers
                 return null;
         }
 
-        // POST api/Tourney/ID/join
-        [HttpPost("{id}/join")]
+        // PUT api/Tourney/ID/join
+        [HttpPut("{id}/join")]
         public async Task<ActionResult> JoinTourney(string id, [FromBody]string address)
         {
             var tourneyCollec = Models.DatabaseConnection.GetDb().GetCollection<SingleEliminationTournament>("SingleEliminationTournaments");
