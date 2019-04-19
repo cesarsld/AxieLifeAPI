@@ -17,15 +17,15 @@ namespace AxieLifeAPI.Controllers
     {
         // GET api/Tourney
         [HttpGet()]
-        public ActionResult<IEnumerable<string>> Get(int match)
+        public ActionResult<IEnumerable<string>> GetTest(int match)
         {
             Console.WriteLine($"Match is {match}");
-            return new string[] { "Hi RCTech, if you received this messages, the test was successful! :D" };
+            return new string[] { "Hi, if you received this messages, the test was successful! :D" };
         }
 
-        // GET api/Tourney/5
+        // GET api/Tourney/ID
         [HttpGet("{id}")]
-        public async Task<ActionResult<SingleEliminationTournament>> Get(string id)
+        public async Task<ActionResult<SingleEliminationTournament>> GetTourney(string id)
         {
             var collec = Models.DatabaseConnection.GetDb().GetCollection<SingleEliminationTournament>("SingleEliminationTournaments");
             var entry = (await collec.FindAsync(a => a.id == id)).FirstOrDefault();
@@ -35,7 +35,7 @@ namespace AxieLifeAPI.Controllers
                 return null;
         }
 
-        // GET api/Tourney/5
+        // POST api/Tourney/ID/join
         [HttpPost("{id}/join")]
         public async Task<ActionResult> JoinTourney(string id, [FromBody]string address)
         {
@@ -60,42 +60,12 @@ namespace AxieLifeAPI.Controllers
                 return NotFound("Tournament not found.");
         }
 
-        [HttpPost("{id}/start")]
-        public async Task<ActionResult> StartTourney(string id, [FromBody]string address)
-        {
-            var tourneyCollec = Models.DatabaseConnection.GetDb().GetCollection<SingleEliminationTournament>("SingleEliminationTournaments");
-            var userCollec = Models.DatabaseConnection.GetDb().GetCollection<UserData>("Users");
-            var tourney = (await tourneyCollec.FindAsync(a => a.id == id)).FirstOrDefault();
-            var user = (await userCollec.FindAsync(a => a.id == address.ToLower())).FirstOrDefault();
-            if (tourney != null)
-            {
-                if (user != null)
-                {
-                    var success = await tourney.AddPlayer(user);
-                    if (success)
-                        return Ok("User joined.");
-                    else
-                        return Ok("User could not join because Tournament has reach max capacity or user has already joined.");
-                }
-                else
-                    return NotFound("User not found.");
-            }
-            else
-                return NotFound("Tournament not found.");
-        }
-
         // POST api/Tourney
         [HttpPost]
-        public async Task<ActionResult<string>> PostNewTourney(TourneyCreationData d)
+        public async Task<ActionResult> PostNewTourney(TourneyCreationData d)
         {
-            var headers = Request.Headers;
-            if (headers.ContainsKey("Authorization"))
-            {
-                //TODO change to fetch list of authorised keys
-                if (headers["Authorization"] != "1234")
-                {
-                    return "Wrong user certification";
-                }
+            if (await CheckAuthentification())
+            { 
                 SingleEliminationTournament newTourney;
                 try
                 {
@@ -104,24 +74,73 @@ namespace AxieLifeAPI.Controllers
                 }
                 catch (Exception e)
                 {
-                    return e.Message + " Could not create tournament instance.";
+                    return Ok(e.Message + " Could not create tournament instance.");
                 }
-                return newTourney.id;
+                return Ok(newTourney.id);
             }
             else
-                return "Missing user certification";
+                return Forbid("Missing or wrong user certification");
         }
 
-        // PUT api/Tourney/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // PUT api/Tourney/ID/resolve
+        [HttpPut("{id}/resolve")]
+        public async Task<ActionResult> PutResolveMatchup(string id, [FromBody] ResolveData resolveData)
         {
+            if (await CheckAuthentification())
+            {
+                var tourneyCollec = Models.DatabaseConnection.GetDb().GetCollection<SingleEliminationTournament>("SingleEliminationTournaments");
+                var tourney = (await tourneyCollec.FindAsync(a => a.id == id)).FirstOrDefault();
+                if (tourney != null)
+                {
+                    if(await tourney.ResolveMatchUp(resolveData.matchIndex, resolveData.winner, resolveData.scoreWinner, resolveData.scoreLoser, resolveData.matchupList))
+                        return Ok("MatchUp Resolved");
+                    else
+                        return Ok("MatchUp could not be resolved");
+                }
+                return NotFound("Tournament ID not found");
+            }
+            return Forbid("Missing or wrong user certification");
+        }
+
+        // PUT api/Tourney/ID/start
+        [HttpPut("{id}/start")]
+        public async Task<ActionResult> PutStartTourney(string id)
+        {
+            if (await CheckAuthentification())
+            {
+                var tourneyCollec = Models.DatabaseConnection.GetDb().GetCollection<SingleEliminationTournament>("SingleEliminationTournaments");
+                var tourney = (await tourneyCollec.FindAsync(a => a.id == id)).FirstOrDefault();
+                if (tourney != null)
+                {
+                    tourney.Start();
+                    await tourney.SaveDataToDb();
+                    return Ok("Tournament Started");
+                }
+                return NotFound("Tournament ID not found");
+            }
+            return Forbid("Missing or wrong user certification");
+
         }
 
         // DELETE api/Tourney/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        private async Task<bool> CheckAuthentification()
+        {
+            var headers = Request.Headers;
+            if (headers.ContainsKey("Authorization"))
+            {
+                var authCollec = Models.DatabaseConnection.GetDb().GetCollection<AuthentificationKey>("AuthKeys");
+                var key = (await authCollec.FindAsync(a => a.id == headers["Authorization"])).FirstOrDefault();
+                if (key != null)
+                    return true;
+                else
+                    return false;
+            }
+                return false;
         }
     }
 
@@ -131,5 +150,17 @@ namespace AxieLifeAPI.Controllers
         public int bo;
         public int max;
         public string creatorAddress;
+    }
+    public class AuthentificationKey
+    {
+        public string id;
+    }
+    public class ResolveData
+    {
+        public int matchIndex;
+        public string winner;
+        public int scoreWinner;
+        public int scoreLoser;
+        public List<int> matchupList;
     }
 }

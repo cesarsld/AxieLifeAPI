@@ -55,6 +55,41 @@ namespace AxieLifeAPI.Controllers
 
         }
 
+        // POST: api/User/register
+        [HttpPost("register")]
+        public async Task<string> PostUserData(BaseUserDataPw value)
+        {
+            var collec = Models.DatabaseConnection.GetDb().GetCollection<UserDataPW>("UserData");
+            var user = (await collec.FindAsync(u => u.id == value.id.ToLower())).FirstOrDefault();
+            if (user == null)
+            {
+                value.id = value.id.ToLower();
+                await collec.InsertOneAsync(new UserDataPW(value));
+                return "User registered.";
+            }
+            else
+                return "User already registered.";
+        }
+
+        // POST: api/User
+        [HttpGet("login")]
+        public async Task<ActionResult> GetLogin(LoginData value)
+        {
+            var collec = Models.DatabaseConnection.GetDb().GetCollection<UserDataPW>("UserData");
+            var user = (await collec.FindAsync(u => u.id == value.id.ToLower())).FirstOrDefault();
+            if (user != null)
+            {
+                if (user.Login(value.password))
+                    return Ok("User logged in.");
+                else
+                    return
+                        Ok("Wrong password.");
+            }
+            else
+                return NotFound("User already registered.");
+
+        }
+
         // PUT: api/User/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)

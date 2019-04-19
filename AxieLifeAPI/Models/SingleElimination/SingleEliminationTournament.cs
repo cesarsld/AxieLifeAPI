@@ -12,6 +12,7 @@ namespace AxieLifeAPI.Models.SingleElimination
     {
         private static readonly Random _rand = new Random();
         private const string VIRTUAL_PLAYER = "BYE";
+        private const string UNRESOLVED = "";
 
         public string id;
         public string creatorAddress;
@@ -30,7 +31,9 @@ namespace AxieLifeAPI.Models.SingleElimination
 
         public List<List<MatchUp>> matchUpHistoryList;
 
-        public SingleEliminationTournament(int seconds, string creator, int bo = 3, int max  = -1)
+        public List<int> indexOfUnresolvedMatches;
+
+        public SingleEliminationTournament(int seconds, string creator, int bo, int max)
         {
             id = "";
             for (int i = 0; i < 40; i++)
@@ -47,6 +50,7 @@ namespace AxieLifeAPI.Models.SingleElimination
             currentRoundTime = 0;
             matchUpList = new List<MatchUp>();
             matchUpHistoryList = new List<List<MatchUp>>();
+            indexOfUnresolvedMatches = new List<int>();
             winner = "";
         }
 
@@ -66,6 +70,47 @@ namespace AxieLifeAPI.Models.SingleElimination
             else return false;
         }
 
+        public async Task<bool> ResolveMatchUp(int matchIndex, string _winner, int scoreWinner = 0, int scoreLoser = 0, List<int> matchList = null)
+        {
+            var matchup = matchUpList[matchIndex];
+            matchup.winner = _winner;
+            if (matchup.player1 == matchup.winner)
+            {
+                matchup.player1Score = scoreWinner;
+                matchup.player2Score = scoreLoser;
+                matchup.loser = matchup.player2;
+            }
+            else if (matchup.player2 == matchup.winner)
+            {
+                matchup.player1Score = scoreLoser;
+                matchup.player2Score = scoreWinner;
+                matchup.loser = matchup.player1;
+            }
+            else
+                return false;
+
+            if (matchList != null)
+                matchup.matchList = await GetMatchesFromIndexes(matchList);
+            indexOfUnresolvedMatches.Remove(matchIndex);
+            if (indexOfUnresolvedMatches.Count == 0)
+                tourneyState = TournamentStates.Running;
+            await SaveDataToDb();
+            return true;
+        }
+
+        private async Task<List<ChallengeData>> GetMatchesFromIndexes(List<int> range)
+        {
+            var collec = DatabaseConnection.GetDb("AxieData").GetCollection<ChallengeData>("ChallengeCollec");
+            var list = new List<ChallengeData>();
+            foreach (var index in range)
+            {
+                var result = (await collec.FindAsync(data => data._id == index)).FirstOrDefault();
+                list.Add(result);
+            }
+            return list;
+        }
+
+        public void Start() => tourneyState = TournamentStates.Ready_For_Seeding;
         public async Task SaveDataToDb()
         {
             var collec = DatabaseConnection.GetDb().GetCollection<SingleEliminationTournament>("SingleEliminationTournaments");

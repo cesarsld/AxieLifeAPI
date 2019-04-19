@@ -34,13 +34,13 @@ namespace AxieLifeAPI.Models
             
         }
 
-        public static IMongoDatabase GetDb()
+        public static IMongoDatabase GetDb(string db = "TournamentData")
         {
 
-            if (Client == null)
-            {
+            //if (Client == null)
+            //{
                 SetupConnection();
-            }
+            //}
             return AxieDatabase;
         }
 

@@ -11,7 +11,6 @@ namespace AxieLifeAPI.Models
         Accepting_Players,
         Ready_For_Seeding,
         Running,
-        Ready_For_Updating,
         Paused,
         Over
     }
