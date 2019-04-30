@@ -15,68 +15,42 @@ namespace AxieLifeAPI.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        // GET: api/User
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
         // GET: api/User/5
         [HttpGet("{address}", Name = "Get")]
-        public async Task<IActionResult> Get(string address)
+        public async Task<IActionResult> GetUser(string address)
         {
-            var collec = Models.DatabaseConnection.GetDb().GetCollection<UserData>("Users");
-            var user = (await collec.FindAsync(u => u.id == address)).FirstOrDefault();
+            var user = await UserModule.GetUser(address);
             if (user != null)
-            {
-                await NotificationSender.StartClient();
-                await NotificationSender.SendMessage(user, "This is a test");
                 return Ok(user);
-            }
             else
                 return NotFound();
         }
 
         // POST: api/User
-        [HttpPost]
-        public async Task<string> Post(BaseUserData value)
+        [HttpPost("register")]
+        public async Task<IActionResult> PostCreateUser(BaseUserData value)
         {
-            var collec = Models.DatabaseConnection.GetDb().GetCollection<UserData>("Users");
-            var user = (await collec.FindAsync(u => u.id == value.id.ToLower())).FirstOrDefault();
-            if (user == null)
-            {
-                value.id = value.id.ToLower();
-                await collec.InsertOneAsync(new UserData(value));
-                return "User registered.";
-            }
+            if (await UserModule.CreateUser(value))
+                return Ok("User registered.");
             else
-                return "User already registered.";
-
+                return Ok("User already registered.");
         }
 
         // POST: api/User/register
-        [HttpPost("register")]
-        public async Task<string> PostUserData(BaseUserDataPw value)
+        [HttpPost("registerPW")]
+        public async Task<IActionResult> PostCreateUSerPw(BaseUserDataPw value)
         {
-            var collec = Models.DatabaseConnection.GetDb().GetCollection<UserDataPW>("UserData");
-            var user = (await collec.FindAsync(u => u.id == value.id.ToLower())).FirstOrDefault();
-            if (user == null)
-            {
-                value.id = value.id.ToLower();
-                await collec.InsertOneAsync(new UserDataPW(value));
-                return "User registered.";
-            }
+            if (await UserModule.CreateUser(value))
+                return Ok("User registered.");
             else
-                return "User already registered.";
+                return Ok("User already registered.");
         }
 
-        // POST: api/User
+        // POST: api/User/login
         [HttpGet("login")]
         public async Task<ActionResult> GetLogin(LoginData value)
         {
-            var collec = Models.DatabaseConnection.GetDb().GetCollection<UserDataPW>("UserData");
-            var user = (await collec.FindAsync(u => u.id == value.id.ToLower())).FirstOrDefault();
+            var user = await UserModule.GetUserPw(value.id);
             if (user != null)
             {
                 if (user.Login(value.password))
@@ -86,8 +60,7 @@ namespace AxieLifeAPI.Controllers
                         Ok("Wrong password.");
             }
             else
-                return NotFound("User already registered.");
-
+                return NotFound("User not registered.");
         }
 
         // PUT: api/User/5
@@ -96,10 +69,16 @@ namespace AxieLifeAPI.Controllers
         {
         }
 
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // DELETE: api/User/5
+        [HttpDelete("delete/{id}")]
+        public async Task<ActionResult> DeleteUser(string id)
         {
+            //TODO add auth tod delete
+            if (await UserModule.DeleteUser(id))
+                return Ok("User Deleted");
+            else
+                return NotFound("User not found");
+
         }
     }
 }

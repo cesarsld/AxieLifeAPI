@@ -25,58 +25,34 @@ namespace AxieLifeAPI.Controllers
 
         // GET api/Tourney/ID
         [HttpGet("{id}")]
-        public async Task<ActionResult<SingleEliminationTournament>> GetTourney(string id)
+        public async Task<ActionResult> GetTourney(string id)
         {
-            var collec = Models.DatabaseConnection.GetDb().GetCollection<SingleEliminationTournament>("SingleEliminationTournaments");
-            var entry = (await collec.FindAsync(a => a.id == id)).FirstOrDefault();
-            if (entry != null)
-                return entry;
+            var tourney = await SEModule.GetTourney(id);
+            if (tourney != null)
+                return Ok(tourney);
             else
-                return null;
+                return NotFound();
         }
 
         // PUT api/Tourney/ID/join
         [HttpPut("{id}/join")]
-        public async Task<ActionResult> JoinTourney(string id, [FromBody]string address)
+        public async Task<ActionResult> JoinTourney(string tourneyId, [FromBody]string userAddress)
         {
-            var tourneyCollec = Models.DatabaseConnection.GetDb().GetCollection<SingleEliminationTournament>("SingleEliminationTournaments");
-            var userCollec = Models.DatabaseConnection.GetDb().GetCollection<UserData>("Users");
-            var tourney = (await tourneyCollec.FindAsync(a => a.id == id)).FirstOrDefault();
-            var user = (await userCollec.FindAsync(a => a.id == address.ToLower())).FirstOrDefault();
-            if (tourney != null)
-            {
-                if (user != null)
-                {
-                    var success = await tourney.AddPlayer(user);
-                    if (success)
-                        return Ok("User joined.");
-                    else
-                        return Ok("User could not join because Tournament has reach max capacity or user has already joined.");
-                }
-                else
-                    return NotFound("User not found.");
-            }
+            if(await SEModule.JoinTourney(tourneyId, userAddress))
+                return Ok("User joined.");
             else
-                return NotFound("Tournament not found.");
+                return Ok("User could not join because Tournament has reach max capacity or user has already joined.");
         }
 
         // POST api/Tourney
         [HttpPost]
         public async Task<ActionResult> PostNewTourney(TourneyCreationData d)
         {
+            // TODO refarctor authentification
             if (await CheckAuthentification())
-            { 
-                SingleEliminationTournament newTourney;
-                try
-                {
-                    newTourney = new SingleEliminationTournament(d.time, d.creatorAddress.ToLower(), d.bo, d.max);
-                    await newTourney.SaveDataToDb();
-                }
-                catch (Exception e)
-                {
-                    return Ok(e.Message + " Could not create tournament instance.");
-                }
-                return Ok(newTourney.id);
+            {
+                var tourneyId = await SEModule.CreateTourney(d);
+                return Ok(tourneyId);
             }
             else
                 return Forbid("Missing or wrong user certification");
@@ -88,16 +64,10 @@ namespace AxieLifeAPI.Controllers
         {
             if (await CheckAuthentification())
             {
-                var tourneyCollec = Models.DatabaseConnection.GetDb().GetCollection<SingleEliminationTournament>("SingleEliminationTournaments");
-                var tourney = (await tourneyCollec.FindAsync(a => a.id == id)).FirstOrDefault();
-                if (tourney != null)
-                {
-                    if(await tourney.ResolveMatchUp(resolveData.matchIndex, resolveData.winner, resolveData.scoreWinner, resolveData.scoreLoser, resolveData.matchupList))
-                        return Ok("MatchUp Resolved");
-                    else
-                        return Ok("MatchUp could not be resolved");
-                }
-                return NotFound("Tournament ID not found");
+                if (await SEModule.ResolveMatchup(id, resolveData))
+                    return Ok("MatchUp Resolved");
+                else
+                    return Ok("MatchUp could not be resolved");
             }
             return Forbid("Missing or wrong user certification");
         }
@@ -108,15 +78,9 @@ namespace AxieLifeAPI.Controllers
         {
             if (await CheckAuthentification())
             {
-                var tourneyCollec = Models.DatabaseConnection.GetDb().GetCollection<SingleEliminationTournament>("SingleEliminationTournaments");
-                var tourney = (await tourneyCollec.FindAsync(a => a.id == id)).FirstOrDefault();
-                if (tourney != null)
-                {
-                    tourney.Start();
-                    await tourney.SaveDataToDb();
+                if(await SEModule.StartTourney(id))
                     return Ok("Tournament Started");
-                }
-                return NotFound("Tournament ID not found");
+                else return NotFound("Tournament ID not found");
             }
             return Forbid("Missing or wrong user certification");
 
@@ -144,23 +108,9 @@ namespace AxieLifeAPI.Controllers
         }
     }
 
-    public class TourneyCreationData
-    {
-        public int time;
-        public int bo;
-        public int max;
-        public string creatorAddress;
-    }
     public class AuthentificationKey
     {
         public string id;
     }
-    public class ResolveData
-    {
-        public int matchIndex;
-        public string winner;
-        public int scoreWinner;
-        public int scoreLoser;
-        public List<int> matchupList;
-    }
+    
 }
