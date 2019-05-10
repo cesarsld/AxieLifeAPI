@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AxieLifeAPI.Models.SingleElimination
+namespace AxieTournamentApi.Models.SingleElimination
 {
     public class TourneyCreationData
     {
@@ -11,5 +11,6 @@ namespace AxieLifeAPI.Models.SingleElimination
         public int bo;
         public int max;
         public string creatorAddress;
+        public string creatorName;
     }
 }

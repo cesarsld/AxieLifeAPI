@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using AxieLifeAPI.Models.Notification;
-using AxieLifeAPI.Models.User;
+using AxieTournamentApi.Models.Notification;
+using AxieTournamentApi.Models.User;
 
-namespace AxieLifeAPI.Models.SingleElimination
+namespace AxieTournamentApi.Models.SingleElimination
 {
     public class SingleEliminationTournament
     {
@@ -15,7 +15,9 @@ namespace AxieLifeAPI.Models.SingleElimination
         private const string UNRESOLVED = "";
 
         public string id;
+        public int challongeId;
         public string creatorAddress;
+        public string creatorName;
 
         public TournamentStates tourneyState;
 
@@ -33,13 +35,14 @@ namespace AxieLifeAPI.Models.SingleElimination
 
         public List<int> indexOfUnresolvedMatches;
 
-        public SingleEliminationTournament(int seconds, string creator, int bo, int max)
+        public SingleEliminationTournament(int seconds, string creator, int bo, int max, string name)
         {
             id = "";
-            for (int i = 0; i < 40; i++)
+            for (int i = 0; i < 15; i++)
                 id += _rand.Next(16).ToString("X");
-
+            id = id.ToLower();
             creatorAddress = creator;
+            creatorName = name;
             participantList = new List<ParticipantData>();
             tourneyState = TournamentStates.Accepting_Players;
 

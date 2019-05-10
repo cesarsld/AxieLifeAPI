@@ -4,13 +4,13 @@ using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
 
-namespace AxieLifeAPI.IO
+namespace AxieTournamentApi.IO
 {
     class IOGetter
     {
         private static readonly string dbUrlPath = "DbKey/DbKey.txt";
         private static readonly string discordKeyPath = "Discord/Key.txt";
-
+        private static readonly string challongeKeyPath = "Challonge/Key.txt";
         public static string GetDiscordKey()
         {
             if (File.Exists(discordKeyPath))
@@ -28,6 +28,15 @@ namespace AxieLifeAPI.IO
                     string key = sr.ReadToEnd();
                     return key;
                 }
+            }
+        }
+
+        public static string GetChallongeKey()
+        {
+            using (StreamReader sr = new StreamReader(challongeKeyPath, Encoding.UTF8))
+            {
+                string key = sr.ReadToEnd();
+                return key;
             }
         }
 

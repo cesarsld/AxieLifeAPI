@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 
-namespace AxieLifeAPI.Models.User
+namespace AxieTournamentApi.Models.User
 {
     public class UserModule
     {

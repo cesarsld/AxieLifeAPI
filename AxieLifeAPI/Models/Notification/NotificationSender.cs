@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Rest;
-using AxieLifeAPI.Models.SingleElimination;
-using AxieLifeAPI.IO;
-using AxieLifeAPI.Models.User;
+using AxieTournamentApi.Models.SingleElimination;
+using AxieTournamentApi.IO;
+using AxieTournamentApi.Models.User;
 
-namespace AxieLifeAPI.Models.Notification
+namespace AxieTournamentApi.Models.Notification
 {
     public class NotificationSender
     {

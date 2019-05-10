@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using AxieLifeAPI.Models.User;
+using AxieTournamentApi.Models.User;
 
-namespace AxieLifeAPI.Models.SingleElimination
+namespace AxieTournamentApi.Models.SingleElimination
 {
     public class ParticipantData
     {

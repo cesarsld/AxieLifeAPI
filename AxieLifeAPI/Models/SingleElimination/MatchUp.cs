@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AxieLifeAPI.Models.SingleElimination
+namespace AxieTournamentApi.Models.SingleElimination
 {
     public class MatchUp
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AxieLifeAPI.Models
+namespace AxieTournamentApi.Models
 {
     public enum TournamentStates
     {

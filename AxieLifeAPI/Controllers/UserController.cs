@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using AxieLifeAPI.Models.User;
+using AxieTournamentApi.Models.User;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using AxieLifeAPI.Models.Notification;
-namespace AxieLifeAPI.Controllers
+using AxieTournamentApi.Models.Notification;
+namespace AxieTournamentApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

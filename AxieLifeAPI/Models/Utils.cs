@@ -8,9 +8,9 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Bson.Serialization;
 using Newtonsoft.Json;
-using AxieLifeAPI.Models.SingleElimination;
+using AxieTournamentApi.Models.SingleElimination;
 
-namespace AxieLifeAPI.Models
+namespace AxieTournamentApi.Models
 {
     class Utils
     {

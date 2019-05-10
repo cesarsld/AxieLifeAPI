@@ -6,10 +6,10 @@ using MongoDB.Driver.Linq;
 using MongoDB.Driver;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using AxieLifeAPI.Models.SingleElimination;
-using AxieLifeAPI.Models.User;
+using AxieTournamentApi.Models.SingleElimination;
+using AxieTournamentApi.Models.User;
 
-namespace AxieLifeAPI.Controllers
+namespace AxieTournamentApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

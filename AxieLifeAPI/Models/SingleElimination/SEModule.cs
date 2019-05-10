@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-namespace AxieLifeAPI.Models.SingleElimination
+namespace AxieTournamentApi.Models.SingleElimination
 {
     public class SEModule
     {
@@ -17,25 +17,29 @@ namespace AxieLifeAPI.Models.SingleElimination
                 {
                     var didJoin = await tourney.AddPlayer(user);
                     if (didJoin)
+                    {
+                        await Challonge.ChallongeModule.AddPlayer(tourney.challongeId, userAddress, user.userName);
                         return true;
+                    }
                     else return false;
                 }
                 else return false;
             }
             else return false;
-
         }
 
         public static async Task<SingleEliminationTournament> GetTourney(string id)
         {
-            var tourneyCollec = Models.DatabaseConnection.GetDb().GetCollection<SingleEliminationTournament>("SingleEliminationTournaments");
+            var tourneyCollec = DatabaseConnection.GetDb().GetCollection<SingleEliminationTournament>("SingleEliminationTournaments");
             var tourney = (await tourneyCollec.FindAsync(a => a.id == id.ToLower())).FirstOrDefault();
             return tourney;
         }
 
         public static async Task<string> CreateTourney(TourneyCreationData data)
         {
-            var newTourney = new SingleEliminationTournament(data.time, data.creatorAddress.ToLower(), data.bo, data.max);
+            var newTourney = new SingleEliminationTournament(data.time, data.creatorAddress.ToLower(), data.bo, data.max, data.creatorName);
+            var challongeId = await Challonge.ChallongeModule.CreateTournament(newTourney.creatorName, newTourney.id);
+            newTourney.challongeId = challongeId;
             await newTourney.SaveDataToDb();
             return newTourney.id;        
         }

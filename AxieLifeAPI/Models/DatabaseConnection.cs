@@ -8,8 +8,8 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver.Linq;
-using AxieLifeAPI.IO;
-namespace AxieLifeAPI.Models
+using AxieTournamentApi.IO;
+namespace AxieTournamentApi.Models
 {
     class DatabaseConnection
     {

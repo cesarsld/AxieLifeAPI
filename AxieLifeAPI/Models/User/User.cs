@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AxieLifeAPI.Models.Cryptography;
-namespace AxieLifeAPI.Models.User
+using AxieTournamentApi.Models.Cryptography;
+namespace AxieTournamentApi.Models.User
 {
     public class BaseUserData
     {
@@ -29,6 +29,7 @@ namespace AxieLifeAPI.Models.User
     {
         public string id;
         public ulong discordId;
+        public string userName;
 
         public List<CompletedTournaments> ongoingTournaments;
         public List<CompletedTournaments> completedTournaments;

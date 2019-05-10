@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace AxieLifeAPI
+namespace AxieTournamentApi
 {
     public class Program
     {
@@ -16,7 +16,8 @@ namespace AxieLifeAPI
         {
             Console.WriteLine(Environment.CurrentDirectory);
             Console.WriteLine("");
-            CreateWebHostBuilder(args).Build().Run();
+            AxieTournamentApi.Models.Challonge.ChallongeModule.CreateTournament().GetAwaiter().GetResult();
+            //CreateWebHostBuilder(args).Build().Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>

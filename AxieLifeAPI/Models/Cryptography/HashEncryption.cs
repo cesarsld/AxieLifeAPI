@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Text;
 
-namespace AxieLifeAPI.Models.Cryptography
+namespace AxieTournamentApi.Models.Cryptography
 {
     public class HashEncryption
     {
