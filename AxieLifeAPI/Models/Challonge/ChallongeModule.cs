@@ -22,7 +22,7 @@ namespace AxieTournamentApi.Models.Challonge
             }
         }
 
-        public static async Task AddPlayer(int challongeId, string playerAddress, string playerName)
+        public static async Task<int> AddPlayer(int challongeId, string playerAddress, string playerName)
         {
             var url = GetPlayerBaseUrl(challongeId);
             url += $"&participant[name]={playerName}";
@@ -30,11 +30,10 @@ namespace AxieTournamentApi.Models.Challonge
             url = url.Replace(" ", "%20");
             using (var cl = new HttpClient())
             {
-                var response = await cl.PutAsync(url, null);
-                if (!response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine("Uh oh...");
-                }
+                var response = await cl.PostAsync(url, null);
+                var content = await response.Content.ReadAsStringAsync();
+                var json = JObject.Parse(content);
+                return (int)json["participant"]["id"];
             }
         }
 

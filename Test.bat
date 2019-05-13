@@ -1,9 +1,6 @@
 echo off
 title Build Push Executable
-echo Test file executed.
-echo I am a lazy boogy.
-cd GitHub
-cd axielifeapi
+echo AxieTournament Web API
 cd AxieLifeAPI
 cd bin
 cd Release

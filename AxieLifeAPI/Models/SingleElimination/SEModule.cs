@@ -17,11 +17,9 @@ namespace AxieTournamentApi.Models.SingleElimination
                 {
                     var didJoin = await tourney.AddPlayer(user);
                     if (didJoin)
-                    {
-                        await Challonge.ChallongeModule.AddPlayer(tourney.challongeId, userAddress, user.userName);
                         return true;
-                    }
-                    else return false;
+                    else
+                        return false;
                 }
                 else return false;
             }

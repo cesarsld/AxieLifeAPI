@@ -14,7 +14,7 @@ namespace AxieTournamentApi.Models.Challonge
         public ChallengePostRequest()
         {
             api_key = IOGetter.GetChallongeKey();
-            tournament = new TournamentJson();
+            //tournament = new TournamentJson();
         }
     }
 }

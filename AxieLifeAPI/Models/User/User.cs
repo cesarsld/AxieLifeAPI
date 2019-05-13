@@ -9,6 +9,7 @@ namespace AxieTournamentApi.Models.User
     {
         public string id;
         public ulong discordId;
+        public string nickName;
     }
 
     public class LoginData
@@ -41,6 +42,7 @@ namespace AxieTournamentApi.Models.User
         {
             id = data.id;
             discordId = data.discordId;
+            userName = data.nickName;
 
             completedTournaments = new List<CompletedTournaments>();
             ongoingTournaments = new List<CompletedTournaments>();

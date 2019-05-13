@@ -16,13 +16,19 @@ namespace AxieTournamentApi
         {
             Console.WriteLine(Environment.CurrentDirectory);
             Console.WriteLine("");
-            AxieTournamentApi.Models.Challonge.ChallongeModule.CreateTournament().GetAwaiter().GetResult();
-            //CreateWebHostBuilder(args).Build().Run();
+            //AxieTournamentApi.Models.Challonge.ChallongeModule.CreateTournament().GetAwaiter().GetResult();
+            CreateWebHostBuilder(args).Build().Run();
         }
-
+#if DEBUG
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseUrls("http://*:1337");
+                .UseStartup<Startup>();
+#else
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+            .UseSetting("https_port", "1337")
+            .UseStartup<Startup>()
+            .UseUrls("https://*:1337");
+#endif
     }
 }

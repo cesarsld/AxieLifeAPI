@@ -17,9 +17,9 @@ namespace AxieTournamentApi.Controllers
     {
         // GET api/Tourney
         [HttpGet()]
-        public ActionResult<IEnumerable<string>> GetTest(int match)
+        public ActionResult<IEnumerable<string>> GetTest()
         {
-            Console.WriteLine($"Match is {match}");
+            Console.WriteLine($"Match is ");
             return new string[] { "Hi, if you received this messages, the test was successful! :D" };
         }
 
@@ -36,9 +36,9 @@ namespace AxieTournamentApi.Controllers
 
         // PUT api/Tourney/ID/join
         [HttpPut("{id}/join")]
-        public async Task<ActionResult> JoinTourney(string tourneyId, [FromBody]string userAddress)
+        public async Task<ActionResult> JoinTourney(string id, [FromBody]string userAddress)
         {
-            if(await SEModule.JoinTourney(tourneyId, userAddress))
+            if(await SEModule.JoinTourney(id, userAddress))
                 return Ok("User joined.");
             else
                 return Ok("User could not join because Tournament has reach max capacity or user has already joined.");
@@ -46,7 +46,7 @@ namespace AxieTournamentApi.Controllers
 
         // POST api/Tourney
         [HttpPost]
-        public async Task<ActionResult> PostNewTourney(TourneyCreationData d)
+        public async Task<ActionResult> CreateNewTourney(TourneyCreationData d)
         {
             // TODO refarctor authentification
             if (await CheckAuthentification())

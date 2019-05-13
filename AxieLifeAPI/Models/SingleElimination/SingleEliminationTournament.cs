@@ -26,12 +26,13 @@ namespace AxieTournamentApi.Models.SingleElimination
         public int totalRoundNumber;
         public int boFormat;
         public int currentRoundTime;
+        public int currentRound;
 
         public List<ParticipantData> participantList;
         public List<MatchUp> matchUpList;
         public string winner;
 
-        public List<List<MatchUp>> matchUpHistoryList;
+        //public List<List<MatchUp>> matchUpHistoryList;
 
         public List<int> indexOfUnresolvedMatches;
 
@@ -51,8 +52,9 @@ namespace AxieTournamentApi.Models.SingleElimination
             maxPlayers = max;
             totalRoundNumber = 0;
             currentRoundTime = 0;
+            currentRound = 1;
             matchUpList = new List<MatchUp>();
-            matchUpHistoryList = new List<List<MatchUp>>();
+            //matchUpHistoryList = new List<List<MatchUp>>();
             indexOfUnresolvedMatches = new List<int>();
             winner = "";
         }
@@ -63,7 +65,11 @@ namespace AxieTournamentApi.Models.SingleElimination
                 return false;
             if (maxPlayers == -1 || participantList.Count < maxPlayers)
             {
-                participantList.Add(new ParticipantData(user));
+                var participant = new ParticipantData(user);
+                participantList.Add(participant);
+
+                participant.challongeId = await Challonge.ChallongeModule.AddPlayer(challongeId, user.id, user.userName);
+
                 if (participantList.Count == maxPlayers)
                     tourneyState = TournamentStates.Ready_For_Seeding;
                 await SaveDataToDb();
