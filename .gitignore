@@ -260,6 +260,6 @@ paket-files/
 __pycache__/
 *.pyc
 
-AxieLifeAPI/DbKey
-AxieLifeAPI/Discord
-AxieLifeApi/Challonge
+AxieTournamentApi/DbKey
+AxieTournamentApi/Discord
+AxieTournamentApi/Challonge

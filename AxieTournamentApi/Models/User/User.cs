@@ -77,12 +77,12 @@ namespace AxieTournamentApi.Models.User
 
             ongoingCreatedTournaments = new List<CompletedTournaments>();
             completedCreatedTournaments = new List<CompletedTournaments>();
-            salt = HashEncryption.GenerateSalt();
-            hash = HashEncryption.GenerateHash(data.password, salt);
+            salt = CryptographyModule.GenerateSalt();
+            hash = CryptographyModule.GenerateHash(data.password, salt);
         }
         public bool Login(string password)
         {
-            if (HashEncryption.ConfirmPassword(password, salt, hash))
+            if (CryptographyModule.ConfirmPassword(password, salt, hash))
                 return true;
             else
                 return false;

@@ -1,9 +1,10 @@
 echo off
 title Build Push Executable
 echo AxieTournament Web API
-cd AxieLifeAPI
+cd AxieTournamentApi
 cd bin
 cd Release
-cd netcoreapp2.2
+cd netcoreapp2.1
 cd publish
-dotnet AxieLifeAPI.dll
+dotnet AxieTournamentApi.dll
+

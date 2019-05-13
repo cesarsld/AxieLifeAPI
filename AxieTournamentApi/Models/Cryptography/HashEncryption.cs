@@ -4,12 +4,27 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Text;
+using Nethereum.Signer;
 
 namespace AxieTournamentApi.Models.Cryptography
 {
-    public class HashEncryption
+    public class CryptographyModule
     {
         private static readonly int saltLengthLimit = 32;
+
+
+        public static bool GetSignedMessage(string sentSignature, string sentAddress)
+        {
+            var msg = "Axie Tournament";
+            var msgHash = Encoding.UTF8.GetBytes(msg);
+            var signer = new EthereumMessageSigner();
+            //var signature = signer.HashAndSign(msg, msg);
+            var address = signer.EcRecover(msgHash, sentSignature);
+            if (address.ToLower() == sentAddress.ToLower())
+                return true;
+            else
+                return false;
+        }
 
         public static byte[] GenerateSalt()
         {

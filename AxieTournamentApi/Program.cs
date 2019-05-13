@@ -16,9 +16,9 @@ namespace AxieTournamentApi
         {
             Console.WriteLine(Environment.CurrentDirectory);
             Console.WriteLine("");
-            //AxieTournamentApi.Models.Challonge.ChallongeModule.CreateTournament().GetAwaiter().GetResult();
             CreateWebHostBuilder(args).Build().Run();
         }
+
 #if DEBUG
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.539
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxieLifeAPI", "AxieLifeAPI\AxieLifeAPI.csproj", "{CE5A191A-25B6-4D54-B863-066FB2A11FC3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxieTournamentApi", "AxieTournamentApi\AxieTournamentApi.csproj", "{18F3279C-57D2-452E-968E-5DBEE5A121E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CE5A191A-25B6-4D54-B863-066FB2A11FC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CE5A191A-25B6-4D54-B863-066FB2A11FC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE5A191A-25B6-4D54-B863-066FB2A11FC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CE5A191A-25B6-4D54-B863-066FB2A11FC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18F3279C-57D2-452E-968E-5DBEE5A121E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18F3279C-57D2-452E-968E-5DBEE5A121E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18F3279C-57D2-452E-968E-5DBEE5A121E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18F3279C-57D2-452E-968E-5DBEE5A121E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {250F025F-FCFA-4E0F-AC45-C2173C7B1854}
+		SolutionGuid = {4FAE93B2-9942-49B3-BCE1-E7C7C58B6CB1}
 	EndGlobalSection
 EndGlobal
