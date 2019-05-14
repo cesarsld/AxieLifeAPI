@@ -13,7 +13,7 @@ namespace AxieTournamentApi.Models.Cryptography
         private static readonly int saltLengthLimit = 32;
 
 
-        public static bool GetSignedMessage(string sentSignature, string sentAddress)
+        public static bool IsSignatureValid(string sentSignature, string sentAddress)
         {
             var msg = "Axie Tournament";
             var msgHash = Encoding.UTF8.GetBytes(msg);

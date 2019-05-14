@@ -7,9 +7,13 @@ namespace AxieTournamentApi.Models.User
 {
     public class BaseUserData
     {
+        //eth address
         public string id;
+        //if they didn't use OAUTH, can have discordId as 0
         public ulong discordId;
+        //ask them do set nickname
         public string nickName;
+        public string signature;
     }
 
     public class LoginData

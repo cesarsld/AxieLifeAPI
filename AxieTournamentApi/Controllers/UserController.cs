@@ -9,6 +9,7 @@ using AxieTournamentApi.Models.User;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using AxieTournamentApi.Models.Notification;
+using AxieTournamentApi.Models.Cryptography;
 namespace AxieTournamentApi.Controllers
 {
     [Route("api/[controller]")]
@@ -22,6 +23,16 @@ namespace AxieTournamentApi.Controllers
             var user = await UserModule.GetUser(address);
             if (user != null)
                 return Ok(user);
+            else
+                return NotFound();
+        }
+
+        // GET: api/User/5
+        [HttpGet("{address}/verify")]
+        public IActionResult VerifyMessage(string address, [FromBody]string signature)
+        {
+            if(CryptographyModule.IsSignatureValid(signature, address))
+                return Ok();
             else
                 return NotFound();
         }
@@ -63,10 +74,14 @@ namespace AxieTournamentApi.Controllers
                 return NotFound("User not registered.");
         }
 
-        // PUT: api/User/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // PUT: api/User/update
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateUser(BaseUserData value)
         {
+            if (await UserModule.UpdateUser(value))
+                return Ok("User updated.");
+            else
+                return Ok("User does not exist");
         }
 
         // DELETE: api/User/5
